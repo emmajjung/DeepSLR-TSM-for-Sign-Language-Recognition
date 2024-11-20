@@ -1,3 +1,10 @@
+Emma update (11/19)
+`my_dataset.py` is modified `ops/dataset.py` for [roboflow dataset](https://universe.roboflow.com/david-lee-d0rhs/american-sign-language-letters/dataset/6#)
+
+`my_main.py` is original model + mac camera
+`my_modified_main.py` is model for roboflow dataset + mac camera (should run?)
+
+
 # TSM: Temporal Shift Module for Efficient Video Understanding [[Website]](https://hanlab18.mit.edu/projects/tsm/) [[arXiv]](https://arxiv.org/abs/1811.08383)[[Demo]](https://www.youtube.com/watch?v=0T6u7S_gq-4)
 
 ```
