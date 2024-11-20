@@ -8,6 +8,7 @@ from torch import nn
 from ops.basic_ops import ConsensusModule
 from ops.transforms import *
 from torch.nn.init import normal_, constant_
+import torch.nn.functional as F
 
 
 class TSN(nn.Module):
@@ -55,7 +56,7 @@ class TSN(nn.Module):
         dropout_ratio:      {}
         img_feature_dim:    {}
             """.format(base_model, self.modality, self.num_segments, self.new_length, consensus_type, self.dropout, self.img_feature_dim)))
-
+        
         self._prepare_base_model(base_model)
 
         feature_dim = self._prepare_tsn(num_class)
@@ -77,6 +78,8 @@ class TSN(nn.Module):
         self._enable_pbn = partial_bn
         if partial_bn:
             self.partialBN(True)
+
+        self.bbox_head = nn.Linear(2048, 4)  # 2048 is the output dimension of ResNet50
 
     def _prepare_tsn(self, num_class):
         feature_dim = getattr(self.base_model, self.base_model.last_layer_name).in_features
@@ -261,30 +264,32 @@ class TSN(nn.Module):
         ]
 
     def forward(self, input, no_reshape=False):
+        original_batch_size = input.size(0)
         if not no_reshape:
             sample_len = (3 if self.modality == "RGB" else 2) * self.new_length
+            input = input.view((-1, sample_len) + input.size()[-2:])
 
-            if self.modality == 'RGBDiff':
-                sample_len = 3 * self.new_length
-                input = self._get_diff(input)
+        base_out = self.base_model(input)
+        print("base_out original shape:", base_out.shape)
 
-            base_out = self.base_model(input.view((-1, sample_len) + input.size()[-2:]))
-        else:
-            base_out = self.base_model(input)
+        # Save the features for bbox before applying new_fc
+        bbox_features = base_out.clone()
 
         if self.dropout > 0:
             base_out = self.new_fc(base_out)
-
-        if not self.before_softmax:
-            base_out = self.softmax(base_out)
+        print("base_out after new_fc:", base_out.shape)
 
         if self.reshape:
-            if self.is_shift and self.temporal_pool:
-                base_out = base_out.view((-1, self.num_segments // 2) + base_out.size()[1:])
-            else:
-                base_out = base_out.view((-1, self.num_segments) + base_out.size()[1:])
-            output = self.consensus(base_out)
-            return output.squeeze(1)
+            base_out = self.consensus(base_out.view((original_batch_size, -1) + base_out.size()[1:]))
+        output = base_out.squeeze(1)
+
+        # For bbox, reshape correctly
+        true_batch_size = original_batch_size
+        bbox_features = bbox_features.view(true_batch_size, -1, 2048)
+        bbox_input = bbox_features.mean(dim=1)  # [32, 2048]
+        bbox_output = self.bbox_head(bbox_input)  # [32, 4]
+
+        return output, bbox_output
 
     def _get_diff(self, input, keep_rgb=False):
         input_c = 3 if self.modality in ["RGB", "RGBDiff"] else 2
