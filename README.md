@@ -2,7 +2,7 @@ Emma update (11/19)
 
 `my_dataset.py` is modified `ops/dataset.py` for [roboflow dataset](https://universe.roboflow.com/david-lee-d0rhs/american-sign-language-letters/dataset/6#)
 
-`my_main.py` is original model + mac camera
+`my_main.py` is original model + mac camera (also modified `ops/models.py` so need to go back to original from their github if you wanna make this work)
 
 `my_modified_main.py` is model for roboflow dataset + mac camera (should run?)
 
