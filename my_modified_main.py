@@ -67,6 +67,11 @@ def train(model, train_loader, val_loader, num_epochs=10):
     torch.save(model.state_dict(), 'asl_model.pth')
 
 def test_model_on_images(model, test_loader, show_images=False):
+    asl_number_letter_map = {
+    0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H', 8: 'I', 9: 'J',
+    10: 'K', 11: 'L', 12: 'M', 13: 'N', 14: 'O', 15: 'P', 16: 'Q', 17: 'R', 18: 'S', 19: 'T',
+    20: 'U', 21: 'V', 22: 'W', 23: 'X', 24: 'Y', 25: 'Z', 26: 'SPACE'
+    }
     correct = 0
     total = 0
     model.eval()
@@ -87,8 +92,17 @@ def test_model_on_images(model, test_loader, show_images=False):
                     img = cv2.imread(img_path)
                     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-                    cv2.putText(img, f"Original: {labels[i].item()}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 3.0, (255, 255, 255), 3)
-                    cv2.putText(img, f"Predicted: {predicted[i].item()}", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 3.0, (255, 255, 255), 3)
+                    #map letters and numbers: 
+                    original_letter = asl_number_letter_map[labels[i].item()]
+                    predicted_letter = asl_number_letter_map[predicted[i].item()]
+                    
+                    # show letter correspondance 
+                    cv2.putText(img, f"Original: {original_letter}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 3.0, (255, 255, 255), 3)
+                    cv2.putText(img, f"Predicted: {predicted_letter}", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 3.0, (255, 255, 255), 3)
+                    # create a window for the popup
+                    cv2.namedWindow("Test Image", cv2.WINDOW_NORMAL)
+                    ## change the window size to fit
+                    cv2.resizeWindow("Test Image", 600, 800)
                     cv2.imshow("Test Image", img)
                     cv2.waitKey(0)
 
