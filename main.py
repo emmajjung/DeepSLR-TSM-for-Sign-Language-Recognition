@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
 from ops.models import TSN
-from my_dataset import ASLDataset
+from dataset import ASLDataset
 import os
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -150,7 +150,7 @@ def main():
     model = load_model()
 
     # Check if the trained model file exists
-    model_path = "asl_model.pth"
+    model_path = "84_asl_model.pth"
     if os.path.exists(model_path):
         print("Loading pre-trained model...")
         model.load_state_dict(torch.load(model_path, weights_only=True))
