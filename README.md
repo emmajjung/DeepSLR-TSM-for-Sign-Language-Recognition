@@ -38,6 +38,9 @@ The project uses Roboflow's [American Sign Language Letters Dataset (v1)](https:
 ## Pretrained Models
 
 Training models may be computationally expensive. Here we provide some of the pretrained models.
+- `84%_asl_model.pth` is a refined model that acheives 84% accuracy on the testing data.
+- `asl_model.pth` is a baseline model that acheives approximately 66% accuracy on the testing data.
+- `epoch1_asl_model.pth` is a basic model that is trained on a single epoch.
 
 ## Future Work 
 
