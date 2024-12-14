@@ -36,17 +36,19 @@ learning_rate_data_10 = {
     0.000055: [77.78],
     0.00008: [80.56],
     0.0001: [80.50],
-    0.0005: [100],
+    0.0005: [66.67],
     0.001: [44.44]
 }
 
-plot_learning_rate_vs_accuracy(learning_rate_data_10, 'Learning Rate vs Accuracy (10 Epochs)')
+# plot_learning_rate_vs_accuracy(learning_rate_data_10, 'Learning Rate vs Accuracy (10 Epochs)')
 
 learning_rate_data_15 = {
     0.000049: [76.36],
     0.00005: [81.94],
     0.000051: [76.39],
-    0.000055: [84.72]
+    0.000055: [84.72], 
+    0.000056: [73.61],
+    0.000057: [75.00]
 }
 
 plot_learning_rate_vs_accuracy(learning_rate_data_15, 'Learning Rate vs Accuracy (15 Epochs)')
@@ -58,13 +60,13 @@ learning_rate_data_20 = {
     0.000051: [79.17],
     0.000055: [79.10]
 }
-plot_learning_rate_vs_accuracy(learning_rate_data_20, 'Learning Rate vs Accuracy (20 Epochs)')
+# plot_learning_rate_vs_accuracy(learning_rate_data_20, 'Learning Rate vs Accuracy (20 Epochs)')
 
 
 learning_rate_data_25 = {
-    0.000049: [100],
+    0.000049: [76.39],
     0.00005: [77.78],
-    0.000051: [100],
+    0.000051: [81.94],
     0.000055: [79.17]
 }
-plot_learning_rate_vs_accuracy(learning_rate_data_25, 'Learning Rate vs Accuracy (25 Epochs)')
+# plot_learning_rate_vs_accuracy(learning_rate_data_25, 'Learning Rate vs Accuracy (25 Epochs)')
