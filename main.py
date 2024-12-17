@@ -6,6 +6,12 @@ from ops.models import TSN
 from dataset import ASLDataset
 import os
 
+asl_number_letter_map = {
+    0: 'None', 1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E', 6: 'F', 7: 'G', 8: 'H', 9: 'I', 10: 'J',
+    11: 'K', 12: 'L', 13: 'M', 14: 'N', 15: 'O', 16: 'P', 17: 'Q', 18: 'R', 19: 'S', 20: 'T',
+    21: 'U', 22: 'V', 23: 'W', 24: 'X', 25: 'Y', 26: 'Z', 
+    }
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
@@ -67,11 +73,6 @@ def train(model, train_loader, val_loader, num_epochs=10):
     torch.save(model.state_dict(), 'asl_model.pth')
 
 def test_model_on_images(model, test_loader, show_images=False):
-    asl_number_letter_map = {
-    0: 'None', 1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E', 6: 'F', 7: 'G', 8: 'H', 9: 'I', 10: 'J',
-    11: 'K', 12: 'L', 13: 'M', 14: 'N', 15: 'O', 16: 'P', 17: 'Q', 18: 'R', 19: 'S', 20: 'T',
-    21: 'U', 22: 'V', 23: 'W', 24: 'X', 25: 'Y', 26: 'Z', 
-    }
     correct = 0
     total = 0
     model.eval()
@@ -161,8 +162,28 @@ def main():
 
     # Test model: Change last parameter to True for showing images
     print("Testing model...")
-    test_accuracy = test_model_on_images(model, test_loader, True)
+    test_accuracy = test_model_on_images(model, test_loader, False)
     print(f"Test accuracy: {test_accuracy:.2f}%")
 
+    open_front_camera = True
+    model.eval()
+    if open_front_camera:
+        cap = cv2.VideoCapture(0)
+        for i in range(2500):
+            _, raw_image = cap.read()
+            raw_image = cv2.flip(raw_image[:,600:1320,:], 1)
+            if i%2 == 0:
+                image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
+                image = transform(image)
+                image = image.to(device)
+                image = image[None, :, :, :]
+                output = model(image)
+                _, predicted = torch.max(output.data, 1)
+                cv2.putText(raw_image, f"Predicted: {asl_number_letter_map[predicted.item()]}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 3)
+                cv2.imshow("Sign Language Recognition", raw_image)
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+    cap.release()
+    cv2.destroyAllWindows()
 if __name__ == '__main__':
     main()
